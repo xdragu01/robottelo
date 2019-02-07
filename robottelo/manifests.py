@@ -20,28 +20,21 @@ from robottelo.ssh import upload_file
 
 class ManifestCloner(object):
     """Manifest clonning utility class."""
-    def __init__(self, template=None, private_key=None, signing_key=None):
+    def __init__(self, template=None, signing_key=None):
         self.template = template
         self.signing_key = signing_key
-        self.private_key = private_key
 
-    def _download_manifest_info(self, name='default'):
+    def _download_manifest_info(self):
         """Download and cache the manifest information."""
-        if self.template is None:
-            self.template = {}
-        self.template[name] = requests.get(
-            settings.fake_manifest.url[name]
-        ).content
-        if self.signing_key is None:
-            self.signing_key = requests.get(settings.fake_manifest.key_url).content
-        if self.private_key is None:
-            self.private_key = serialization.load_pem_private_key(
-                self.signing_key,
-                password=None,
-                backend=default_backend()
-            )
+        self.template = requests.get(settings.fake_manifest.url).content
+        self.signing_key = requests.get(settings.fake_manifest.key_url).content
+        self.private_key = serialization.load_pem_private_key(
+            self.signing_key,
+            password=None,
+            backend=default_backend()
+        )
 
-    def clone(self, org_environment_access=False, name='default'):
+    def clone(self, org_environment_access=False):
         """Clones a RedHat-manifest file.
 
         Change the consumer ``uuid`` and sign the new manifest with
@@ -52,20 +45,14 @@ class ManifestCloner(object):
         :param org_environment_access: Whether to modify consumer content
             access mode to org_environment (Golden ticket enabled manifest).
 
-        :param name: which manifest url to clone (named key-value pairs
-            are defined as fake_manifest.url value in robottelo.properties
-            (default: 'default')
-
         :return: A file-like object (``BytesIO`` on Python 3 and
             ``StringIO`` on Python 2) with the contents of the cloned
             manifest.
         """
-        if (self.signing_key is None or
-                self.template is None or
-                self.template.get(name) is None):
-            self._download_manifest_info(name)
+        if self.signing_key is None or self.template is None:
+            self._download_manifest_info()
 
-        template_zip = zipfile.ZipFile(six.BytesIO(self.template[name]))
+        template_zip = zipfile.ZipFile(six.BytesIO(self.template))
         # Extract the consumer_export.zip from the template manifest.
         consumer_export_zip = zipfile.ZipFile(
             six.BytesIO(template_zip.read('consumer_export.zip')))
@@ -112,23 +99,18 @@ class ManifestCloner(object):
         manifest.seek(0)
         return manifest
 
-    def original(self, name='default'):
+    def original(self):
         """Returns the original manifest as a file-like object.
 
-        :param name: A name of the manifest as defined in robottelo.properties
-
         Be aware that using the original manifest and not removing it
-        afterwards will make it impossible to import it to any other
-        Organization.
+        afterwards will make impossible to import it on any other Organization.
 
         Make sure to close the returned file-like object in order to clean up
         the memory used to store it.
         """
-        if (self.signing_key is None or
-                self.template is None or
-                self.template.get(name) is None):
-            self._download_manifest_info(name)
-        return six.BytesIO(self.template[name])
+        if self.signing_key is None or self.template is None:
+            self._download_manifest_info()
+        return six.BytesIO(self.template)
 
 
 # Cache the ManifestCloner in order to avoid downloading the manifest template
@@ -147,13 +129,13 @@ class Manifest(object):
             # my fancy stuff
     """
     def __init__(self, content=None, filename=None,
-                 org_environment_access=False, name='default'):
+                 org_environment_access=False):
         self._content = content
         self.filename = filename
 
         if self._content is None:
             self._content = _manifest_cloner.clone(
-                org_environment_access=org_environment_access, name=name)
+                org_environment_access=org_environment_access)
         if self.filename is None:
             self.filename = u'/var/tmp/manifest-{0}.zip'.format(
                     int(time.time()))
@@ -173,14 +155,11 @@ class Manifest(object):
             self.content.close()
 
 
-def clone(org_environment_access=False, name='default'):
+def clone(org_environment_access=False):
     """Clone the cached manifest and return a ``Manifest`` object.
 
     :param org_environment_access: Whether to modify consumer content
         access mode to org_environment (Golden ticket enabled manifest).
-
-    :param name: key name of the fake_manifests.url dict defined in
-        robottelo.properties
 
     Is hightly recommended to use this with the ``with`` statement to make that
     the content of the manifest (file-like object) is closed properly::
@@ -188,14 +167,11 @@ def clone(org_environment_access=False, name='default'):
         with clone() as manifest:
             # my fancy stuff
     """
-    return Manifest(org_environment_access=org_environment_access, name=name)
+    return Manifest(org_environment_access=org_environment_access)
 
 
-def original_manifest(name='default'):
+def original_manifest():
     """Returns a ``Manifest`` object filed with the template manifest.
-
-    :param name: key name of the fake_manifests.url dict defined in
-        robottelo.properties
 
     Make sure to remove the manifest after its usage otherwiser the Satellite 6
     server will not accept it anymore on any other organization.
@@ -206,7 +182,7 @@ def original_manifest(name='default'):
         with original_manifest() as manifest:
             # my fancy stuff
     """
-    return Manifest(_manifest_cloner.original(name=name))
+    return Manifest(_manifest_cloner.original())
 
 
 @lock_function
