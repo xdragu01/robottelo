@@ -6,6 +6,7 @@ http://sphinx-doc.org/config.html
 """
 import sys
 import os
+from mock import Mock as MagicMock
 # pylint:disable=invalid-name
 
 # Add the Robottelo root directory to the system path. This allows references
@@ -17,6 +18,21 @@ sys.path.insert(
         os.path.pardir
     ))
 )
+
+class Mock(MagicMock):
+    """Amazing mock
+    """
+    @classmethod
+    def __getattr__(cls, name):
+        return Mock()
+
+    @classmethod
+    def __getitem__(cls, name):
+        return Mock()
+
+
+MOCK_MODULES = ['pycurl']
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # Project Information ---------------------------------------------------------
 

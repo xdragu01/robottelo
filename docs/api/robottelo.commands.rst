@@ -1,9 +1,9 @@
-:mod:`robottelo.commands`
-===========================
+.. :mod:`robottelo.commands`
+.. ===========================
 
-.. automodule:: robottelo.commands
+.. .. automodule:: robottelo.commands
 
-:mod:`robottelo.commands.ui`
---------------------------------
+.. :mod:`robottelo.commands.ui`
+.. --------------------------------
 
-.. automodule:: robottelo.commands.ui
+.. .. automodule:: robottelo.commands.ui

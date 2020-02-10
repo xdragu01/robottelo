@@ -33,19 +33,20 @@
 
 .. automodule:: tests.foreman.api.test_computeprofile
 
-:mod:`tests.foreman.api.test_computeresource`
----------------------------------------------
+:mod:`tests.foreman.api.test_computeresource_libvirt`
+-----------------------------------------------------
 
-.. automodule:: tests.foreman.api.test_computeresource
+.. automodule:: tests.foreman.api.test_computeresource_libvirt
+
+:mod:`tests.foreman.api.test_contentaccess`
+-------------------------------------------
+
+.. automodule:: tests.foreman.api.test_contentaccess
 
 :mod:`tests.foreman.api.test_contentmanagement`
 -----------------------------------------------
 
 .. automodule:: tests.foreman.api.test_contentmanagement
-:mod:`tests.foreman.api.test_contentaccess`
--------------------------------------------
-
-.. automodule:: tests.foreman.api.test_contentaccess
 
 :mod:`tests.foreman.api.test_contentviewfilter`
 -----------------------------------------------
@@ -122,6 +123,11 @@
 
 .. automodule:: tests.foreman.api.test_host
 
+:mod:`tests.foreman.api.test_ldapauthsource`
+--------------------------------------------
+
+.. automodule:: tests.foreman.api.test_ldapauthsource
+
 :mod:`tests.foreman.api.test_lifecycleenvironment`
 --------------------------------------------------
 
@@ -177,6 +183,11 @@
 
 .. automodule:: tests.foreman.api.test_puppet
 
+:mod:`tests.foreman.api.test_reporttemplates`
+---------------------------------------------
+
+.. automodule:: tests.foreman.api.test_reporttemplates
+
 :mod:`tests.foreman.api.test_repository`
 ----------------------------------------
 
@@ -206,6 +217,11 @@
 ----------------------------------------
 
 .. automodule:: tests.foreman.api.test_smartproxy
+
+:mod:`tests.foreman.api.test_subnet`
+------------------------------------
+
+.. automodule:: tests.foreman.api.test_subnet
 
 :mod:`tests.foreman.api.test_subscription`
 ------------------------------------------
