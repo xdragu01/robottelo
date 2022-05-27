@@ -241,7 +241,7 @@ def test_convert2rhel_oracle(target_sat, oracle, activation_key_rhel, version):
     :CaseImportance: Medium
     """
     host_content = target_sat.api.Host(id=oracle.hostname).read_json()
-    assert host_content['operatingsystem_name'] == f"OracleLinux {version}"
+    assert host_content['operatingsystem_name'].startswith(f"OracleLinux {version}")
 
     # execute job 'Convert 2 RHEL' on host
     template_id = (
